@@ -55,18 +55,18 @@
         "solver_wrappers" :
         [
             {
-                "type" : "solver_wrappers.pipe.flow_solver",
+                "type" : "solver_wrappers.pipe2D.flow_solver",
                 "settings" :
                 {
                     "working_directory" : "CFD",
                     "input_file"  : "solver_parameters.json",
                     "interface_input" :
                     {
-                        "wall": "AREA"
+                        "wall": "DISPLACEMENT"
                     },
                     "interface_output" :
                     {
-                        "wall" : "PRESSURE"
+                        "wall" : ["PRESSURE","TRACTION"]
                     }
                 }
             },
@@ -75,18 +75,18 @@
                 "settings": {
                     "solver_wrapper" :
                     {
-                        "type" : "solver_wrappers.pipe.structure_solver",
+                        "type" : "solver_wrappers.pipe2D.structure_solver",
                         "settings" :
                         {
                             "working_directory" : "CSD",
                             "input_file"  : "solver_parameters.json",
                             "interface_input" :
                             {
-                                "wall" : "PRESSURE"
+                                "wall" : ["PRESSURE","TRACTION"]
                             },
                             "interface_output" :
                             {
-                                "wall": "AREA"
+                                "wall": "DISPLACEMENT"
                             }
                         }
                     },
@@ -98,7 +98,7 @@
                             "type": "mappers.linear",
                             "settings":
                             {
-                                "directions" : ["Z"],
+                                "directions" : ["Y","Z"],
                                 "balanced_tree" : false,
                                 "parallel": true
                             }
@@ -112,7 +112,7 @@
                             "type": "mappers.linear",
                             "settings":
                             {
-                                "directions" : ["Z"],
+                                "directions" : ["Y","Z"],
                                 "balanced_tree" : false,
                                 "parallel": true
                             }

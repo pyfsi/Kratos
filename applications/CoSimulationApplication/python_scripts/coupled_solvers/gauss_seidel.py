@@ -31,6 +31,7 @@ class CoupledSolverGaussSeidel(CoSimulationComponent):
                             self.solver_wrappers[0], self.solver_wrappers[1]]
 
         self.x = []
+        self.omega = 1.0
 
     def Initialize(self):
         super().Initialize()
@@ -83,7 +84,7 @@ class CoupledSolverGaussSeidel(CoSimulationComponent):
         self.convergence_criterion.Update(r)
         # Coupling iteration loop
         while not self.convergence_criterion.IsSatisfied():
-            self.x += r
+            self.x += self.omega * r
             y = self.solver_wrappers[0].SolveSolutionStep(self.x)
             xt = self.solver_wrappers[1].SolveSolutionStep(y)
             r = xt - self.x

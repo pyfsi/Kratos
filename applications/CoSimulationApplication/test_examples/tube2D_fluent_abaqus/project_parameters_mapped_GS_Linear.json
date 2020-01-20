@@ -3,7 +3,7 @@
     {
         "echo_level" : 1,
         "start_step" : 1,
-        "stop_step" : 10,
+        "stop_step" : 2,
         "data_structure" : "pyKratos"
     },
     "coupled_solver" :
@@ -12,13 +12,12 @@
         "settings" :
         {
             "echo_level" : 1,
-            "omega" : 0.00001,
             "model" :
             {
                 "type": "coupled_solvers.models.ls",
                 "settings":
                 {
-                    "min_significant": 1e-09,
+                    "min_significant": 1e-10,
                     "q": 10
                 }
             }
@@ -57,19 +56,19 @@
                 "type": "solver_wrappers.fluent.2019R1",
                 "settings": {
                     "working_directory" : "CFD",
-                    "case_file": "case_tube3d.cas",
-                    "dimensions": 3,
+                    "case_file": "case_tube2d.cas",
+                    "dimensions": 2,
                     "unsteady": true,
                     "timestep_start": 0,
-                    "thread_names": ["wall"],
+                    "thread_names": ["beamoutside"],
                     "delta_t": 1e-04,
                     "interface_input":
                     {
-                        "wall_nodes": "DISPLACEMENT"
+                        "beamoutside_nodes": "DISPLACEMENT"
                     },
                     "interface_output":
                     {
-                        "wall_faces": ["PRESSURE", "TRACTION"]
+                        "beamoutside_faces": ["PRESSURE", "TRACTION"]
                     },
                     "cores": 4,
                     "fluent_gui": false,
@@ -88,20 +87,20 @@
                         "settings": {
                             "working_directory" : "CSM",
                             "cores": 1,
-                            "dimensions": 3,
+                            "dimensions": 2,
                             "arraysize": 10e5,
                             "surfaces": 1,
                             "ramp": 0,
                             "delta_T": 1e-4,
                             "timestep_start": 0,
-                            "surfaceIDs": ["WALLOUTSIDE"],
+                            "surfaceIDs": ["BEAMINSIDEMOVING"],
                             "interface_input":
                             {
-                                "WALLOUTSIDE_load_points": ["PRESSURE", "TRACTION"]
+                                "BEAMINSIDEMOVING_load_points": ["PRESSURE", "TRACTION"]
                             },
                             "interface_output":
                             {
-                                "WALLOUTSIDE_nodes": "DISPLACEMENT"
+                                "BEAMINSIDEMOVING_nodes": "DISPLACEMENT"
                             },
                             "mp_mode": "THREADS",
                             "input_file": "Base.inp",
@@ -110,31 +109,64 @@
                     },
                     "mapper_interface_input":
                     {
-						"type" : "mappers.interface",
+                        "type" : "mappers.interface",
 						"settings" :
 						{
-                            "type" : "mappers.radial_basis",
+	                        "type" : "mappers.combined",
                             "settings" :
                             {
-                                "balanced_tree" : false,
-                                "directions" : ["X", "Y", "Z"],
-                                "parallel" : true
+                                "mappers" :
+                                [
+                                    {
+                                        "type" :   "mappers.permutation",
+                                        "settings" :
+                                        {
+                                            "permutation" : [1, 0, 2]
+                                        }
+                                    },
+                                    {
+                                        "type": "mappers.linear",
+                                        "settings":
+                                        {
+                                            "directions" : ["X","Y"],
+                                            "balanced_tree" : false,
+                                            "parallel": true
+                                        }
+                                    }
+                                ]
                             }
 						}
                     },
                     "mapper_interface_output":
                     {
-						"type" : "mappers.interface",
+                        "type" : "mappers.interface",
 						"settings" :
-						{
-	                        "type" : "mappers.radial_basis",
-                            "settings" :
-                            {
-                                "balanced_tree" : false,
-                                "directions" : ["X", "Y", "Z"],
-                                "parallel" : true
+                        {
+                            "type": "mappers.combined",
+                            "settings": {
+                                "mappers": [
+                                    {
+                                        "type": "mappers.permutation",
+                                        "settings": {
+                                            "permutation": [
+                                                1,
+                                                0,
+                                                2
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "type": "mappers.linear",
+                                        "settings":
+                                        {
+                                            "directions" : ["X","Y"],
+                                            "balanced_tree" : false,
+                                            "parallel": true
+                                        }
+                                    }
+                                ]
                             }
-						}
+                        }
                     }
                 }
             }

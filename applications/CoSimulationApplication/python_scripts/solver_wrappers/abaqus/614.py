@@ -5,6 +5,9 @@ import time
 import numpy as np
 import re
 
+import matplotlib.pyplot as plt
+
+
 import KratosMultiphysics as KM
 from KratosMultiphysics.CoSimulationApplication.co_simulation_component import CoSimulationComponent
 from KratosMultiphysics.CoSimulationApplication.co_simulation_interface import CoSimulationInterface
@@ -500,11 +503,11 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
 
         self.iteration = 0
         self.timestep += 1
-        print(f'\tTimestep {self.timestep}')
+        print(f'\tTimestep {self.timestep}',flush=True)
 
     def SolveSolutionStep(self, interface_input):
         self.iteration += 1
-        print(f'\t\tIteration {self.iteration}')
+        print(f'\t\tIteration {self.iteration}',flush=True)
 
         # store incoming loads
         self.interface_input.SetPythonList(interface_input.GetPythonList())
@@ -558,7 +561,7 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
         cmd = f"abaqus ./GetOutput.exe CSM_Time{self.timestep} 1 >> AbaqusSolver.log 2>&1"
         self.run_shell(self.dir_csm, [cmd], name='GetOutput')
 
-        # Read Abaqus output data
+            # Read Abaqus output data
         for key in self.settings['interface_output'].keys():
             mp = self.model[key]
             # read in Nodes file for surface nodes
@@ -566,6 +569,9 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
             disp_file = join(self.dir_csm, tmp)
             disp = np.loadtxt(disp_file, skiprows=1)
 
+            tmp2 = f"CSM_Time{self.timestep}Surface{mp.thread_id}Output_Iter{self.iteration}.dat"
+            cmd = f"cp {disp_file} {join(self.dir_csm,tmp2)}"
+            os.system(cmd)
             if disp.shape[1] != self.dimensions:
                 raise ValueError(f"given dimension does not match coordinates")
 
@@ -585,6 +591,31 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
 
                 node.SetSolutionStepValue(self.displacement, 0, disp_tmp[index, :].tolist())
                 index += 1
+
+
+        disp_x, disp_y, disp_z = [], [], []
+
+        for key in [_[0] for _ in self.interface_output.model_parts_variables]:
+            for node in self.model[key].Nodes:
+                disp = node.GetSolutionStepValue(self.displacement)
+                disp_x.append(disp[0])
+                disp_y.append(disp[1])
+                disp_z.append(disp[2])
+
+        #
+        # plt.figure()
+        # plt.title('abaqus')
+        # plt.plot(disp_x, label='x')
+        # plt.plot(disp_y, label='y')
+        # plt.plot(disp_z, '--', label='z')
+        # plt.legend()
+
+
+        # disp_tmp = self.interface_output.GetPythonList()
+        #
+        # plt.figure()
+        # plt.plot(disp_tmp, label='abaqus')
+
 
         return self.interface_output
 
@@ -802,6 +833,9 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
                         file.write(f'{node.X:27.17e} {node.Y:27.17e} {node.Z:27.17e} {node.Id:>27}\n')
 
     def write_loads(self):
+        # os.system(
+        #     f"cp -r /cfdfile2/data/fm/lucas/Tango_Test/Data/AbaqusSolver0/FSI1Refine0Time1Surface0Cpu0Input_Iter1.dat "
+        #     f"{self.dir_csm}/CSM_Time1Surface0Cpu0Input.dat")
         for key in self.settings['interface_input'].keys():
             mp = self.model[key]
             tmp = f'CSM_Time{self.timestep}Surface{mp.thread_id}Cpu0Input.dat'
@@ -816,6 +850,10 @@ class SolverWrapperAbaqus614(CoSimulationComponent):
                         file.write(f'{pressure:27.17e} {traction[0]:27.17e} {traction[1]:27.17e}\n')
                     else:
                         file.write(f'{pressure:27.17e} {traction[0]:27.17e} {traction[1]:27.17e} {traction[2]:27.17e}\n')
+
+            tmp2 = f"CSM_Time{self.timestep}Surface{mp.thread_id}Cpu0Input_Iter{self.iteration}.dat"
+            cmd = f"cp {file_name} {join(self.dir_csm, tmp2)}"
+            os.system(cmd)
 
             if self.iteration == 1 and self.timestep == 1 and self.settings[
                 'ramp'].GetInt() == 1:  # Start of a simulation with ramp, needs an initial load at time 0

@@ -1,0 +1,17 @@
+{
+  "echo_level": 1,
+  "l": 0.05,
+  "start": -0.025,
+  "d": 0.01,
+  "rhof": 1000.0,
+  "ureference": 1.0,
+  "uamplitude": 0.1,
+  "uperiod": 1.0,
+  "utype": 1,
+  "e": 300000.0,
+  "h": 0.002,
+  "m": 100,
+  "newtonmax": 10,
+  "newtontol": 1e-12,
+  "dt": 0.0001
+}

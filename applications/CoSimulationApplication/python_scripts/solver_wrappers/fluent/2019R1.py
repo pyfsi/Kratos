@@ -13,6 +13,7 @@ from KratosMultiphysics.CoSimulationApplication.co_simulation_interface import C
 import KratosMultiphysics.CoSimulationApplication.co_simulation_tools as cs_tools
 cs_data_structure = cs_tools.cs_data_structure
 
+import matplotlib.pyplot as plt
 
 def Create(parameters):
     return SolverWrapperFluent2019R1(parameters)
@@ -278,16 +279,55 @@ class SolverWrapperFluent2019R1(CoSimulationComponent):
         self.iteration += 1
         print(f'\t\tIteration {self.iteration}')
 
+        disp_tmp = interface_input.GetPythonList()
+        # plt.plot(disp_tmp, label='fluent')
+
+        # print('fluent:')
+        # print(max(disp_tmp))
+
         # store incoming displacements
         self.interface_input.SetPythonList(interface_input.GetPythonList())
 
+        disp_tmp2 = self.interface_input.GetPythonList()
+
+        # plt.plot(disp_tmp2, ':', label='fluent 2')
+        # plt.legend()
+
+
         # update X,Y,Z in interface
+
+
+        x_ = []
+        y_ = []
+
+        disp_x, disp_y, disp_z = [], [], []
+
         for key in [_[0] for _ in self.interface_input.model_parts_variables]:
             for node in self.model[key].Nodes:
                 disp = node.GetSolutionStepValue(self.displacement)
+                disp_x.append(disp[0])
+                disp_y.append(disp[1])
+                disp_z.append(disp[2])
+
                 node.X = node.X0 + disp[0]
                 node.Y = node.Y0 + disp[1]
                 node.Z = node.Z0 + disp[2]
+                x_.append(node.X)
+                y_.append(node.Y)
+
+        plt.figure()
+        plt.plot(x_, y_)
+
+        plt.figure()
+        plt.title('fluent')
+        plt.plot(disp_x, label='x')
+        plt.plot(disp_y, label='y')
+        plt.plot(disp_z, '--', label='z')
+        plt.legend()
+
+        # plt.show()
+        plt.close('all')
+
 
         # write interface data
         self.write_node_positions()
@@ -295,6 +335,11 @@ class SolverWrapperFluent2019R1(CoSimulationComponent):
         # let Fluent run, wait for data
         self.send_message('continue')
         self.wait_message('continue_ready')
+
+        tmp = self.dir_cfd+f"/nodes_update_timestep{self.timestep}_thread3.dat"
+        tmp2 = self.dir_cfd+f'/nodes_update_timestep{self.timestep}_thread3_Iter{self.iteration-1}.dat'
+        cmd = f"cp {tmp} {join(self.dir_cfd, tmp2)}"
+        os.system(cmd)
 
         # read data from Fluent
         for key in self.settings['interface_output'].keys():
@@ -304,6 +349,11 @@ class SolverWrapperFluent2019R1(CoSimulationComponent):
             tmp = f'pressure_traction_timestep{self.timestep}_thread{mp.thread_id}.dat'
             file_name = join(self.dir_cfd, tmp)
             data = np.loadtxt(file_name, skiprows=1)
+
+            tmp2 = f'pressure_traction_timestep{self.timestep}_thread{mp.thread_id}_Iter{self.iteration}.dat'
+            cmd = f"cp {file_name} {join(self.dir_cfd, tmp2)}"
+            os.system(cmd)
+
             if data.shape[1] != self.dimensions + 1 + self.mnpf:
                 raise ValueError('given dimension does not match coordinates')
 
