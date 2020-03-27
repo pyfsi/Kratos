@@ -13,8 +13,13 @@ Subcycling within the structural solver is possible.
 `Loadpoints`: Every element has load points. This is where the loads (input to Abaqus) are applied.  
 
 ## Environment
+ - A working directory for Abaqus needs to be created within the main directory. Its **relative path to the main directory** should be specified in the .json file.
+ - Abaqus needs an `AbaqusHosts.txt` file in the working directory.
+ - This host-file lists the machines on which Abaqus is allowed to run. One line per requested core, but excessive lines cause no harm.
+ - The `extra directory` contains an `Example_makeHostFile.sh` which was used the generate a host file for the local system.
+ - The Abaqus license server needs to be specified in the parametrized file `abaqus_v6.env` which is present in the `source directory` 
+ - The `extra directory` contains a file `abaqus_setup` which should be sourced in the terminal that will be used to run the simulation. This script loads the Abaqus module as well as the compilers.
 
-## Input File
 
 ## Parameters 
 This section describes the Parameters in the JSON file, listed in alphabetical order. A distinction is made between mandatory and optional parameters.
