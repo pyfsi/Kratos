@@ -120,3 +120,4 @@ CreateVectorVariable("EXTERNAL_FORCES_VECTOR")
 
 CreateDoubleVariable("AREA")
 CreateArray3Variable("TRACTION")
+CreateArray3Variable("WALLSHEARSTRESS")
