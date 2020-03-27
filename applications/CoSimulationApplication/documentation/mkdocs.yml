@@ -15,6 +15,7 @@ nav:
     - index.md
     - SolverWrappers:
         - fluent.md
+        - abaqus.md
         - python_solvers.md
     - TestExamples:
         - test_examples.md
