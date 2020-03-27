@@ -19,7 +19,7 @@ application     CoCoNuT_pimpleFoam;
 
 startFrom       startTime;
 
-startTime       0;
+startTime       0.1;
 
 stopAt          endTime;
 
