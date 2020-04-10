@@ -106,6 +106,10 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
 
+    #include "readControls.H"
+    #include "CourantNo.H"
+    #include "setDeltaT.H"
+
     while (runTime.run()) // or True?
     {
         usleep(1000); // Expressed in microseconds 
@@ -114,11 +118,7 @@ int main(int argc, char *argv[])
     	{
         	remove("next.coco");
         	
-    		#include "readControls.H"
-    		#include "CourantNo.H"
-    		#include "setDeltaT.H"
-        	
-        	runTime++;
+	      	runTime++;
         	OFstream outfile ("next_ready.coco");
         	outfile << "Joris says: good job on next.coco" << endl;
     		Info << "Time = " << runTime.timeName() << nl << endl; // Might be deleted when linked to CoCoNuT (which already outputs current time step)

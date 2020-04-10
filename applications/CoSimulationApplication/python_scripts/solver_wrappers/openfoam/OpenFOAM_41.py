@@ -822,7 +822,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                         file.close()
                     os.system("wc -l " + disp_file + " > lengthDisp")
                     lengthDisp_file=open("lengthDisp",'r')
-                    length_disp=int(lengthDisp_file.readline())
+                    length_disp=int(lengthDisp_file.readline().split(" ")[0])
                     lengthDisp_file.close()
                     os.system("tail -n " + str(length_disp-(startNr+1)) + " " + disp_file + " > tempDisp2")
                     startToEndNr=self.find_string_in_file("}", "tempDisp2")
@@ -910,7 +910,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
 
 
     def wait_message(self, message):
-        waitTimeLimit=0.5*60 # 10 minutes maximum waiting time for a single flow solver iteration
+        waitTimeLimit=10*60 # 10 minutes maximum waiting time for a single flow solver iteration
         cumulTime=0
         file = os.path.join(self.working_directory, message + ".coco")
         while not os.path.isfile(file):
