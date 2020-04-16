@@ -310,7 +310,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
 
         # Create Variables
         self.pressure=vars(KM)['PRESSURE']
-        self.shear=KM.KratosGlobals.GetVariable('WALLSHEARSTRESS') #used longer definition here because wallshearstress might be overwritten in future updates - this method has more clear error message if variable is not found
+        self.shear=KM.KratosGlobals.GetVariable('TRACTION') #used longer definition here because wallshearstress might be overwritten in future updates - this method has more clear error message if variable is not found
         self.displacement=vars(KM)['DISPLACEMENT']
         
              
