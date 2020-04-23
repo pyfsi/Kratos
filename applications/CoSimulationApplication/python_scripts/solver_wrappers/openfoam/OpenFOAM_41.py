@@ -47,6 +47,8 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         self.write_precision = self.settings["write_precision"].GetInt() # writePrecision-parameter in OpenFOAM
         self.time_precision = self.settings["time_precision"].GetInt() # timePrecision-parameter in OpenFOAM
         self.boundary_names = [_.GetString() for _ in self.settings['boundary_names'].list()] # boundary_names is the set of boundaries where the moving interface is located (will be used to go through OF-files)
+        self.meshmotion_solver=self.settings["meshmotion_solver"].GetString()
+        self.diffusivity=self.settings["diffusivity"].GetString()
         
         #Check that the boundary_names and the interface_input and interface_output are defined consistently in the JSON-file
         #For every boundary_name element, there should be one interface_input (boundary_name+"_input") element and one interface_output (boundary_name+"_output") element.
@@ -125,7 +127,22 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                 self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects.so",key,False,False)
             nKey += 1
         self.write_footer(controlDict_name)
-    
+        # DynamicMeshDict: replace raw settings by actual settings defined by user in json-file 
+        dynamicMeshDict_raw_name=os.path.join(os.path.realpath(os.path.dirname(__file__)),"dynamicMeshDict_raw")
+        dynamicMeshDict_name=os.path.join(self.working_directory,"constant/dynamicMeshDict")
+        with open(controlDict_raw_name,'r') as rawFile:
+            with open(controlDict_name,'w') as newFile:
+                for line in rawFile:
+                    line=line.replace('|MESHMOTION_SOLVER|',str(self.meshmotion_solver))
+                    line=line.replace('|DIFFUSIVITY|',str(self.diffusivity))
+                    line=line.replace('|NUM_INTERFACE_INPUT|',str(len(self.settings['boundary_names'].list())))
+                    line=line.replace('|INTERFACE_INPUT|',_.GetString() for _ in self.settings['boundary_names'].list())
+                    newFile.write(line)
+        rawFile.close()
+        newFile.close()
+        nKey=0
+        self.write_footer(dynamicMeshDict_name)
+        
         # Creating Model
         self.model = cs_data_structure.Model()
         print("The model for OpenFOAM will be created. Please make sure all patch names given under the 'interface' setting are also found in the mesh used in OpenFOAM (see 'constant/polyMesh') \n")
