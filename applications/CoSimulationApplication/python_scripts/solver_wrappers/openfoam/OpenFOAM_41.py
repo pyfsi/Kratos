@@ -359,7 +359,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
             os.system("mkdir "+ newPath)
         else :
             for i in np.arange(self.cores):
-                newPath=os.path.join(self.working_directory, "processor", str(i), str(self.physical_time))
+                newPath=os.path.join(self.working_directory, "processor"+str(i), str(self.physical_time))
                 if os.path.isdir(newPath):
                     if i==0:
                         print("\n\n\n Warning! In 5s, CoCoNuT will overwrite existing time step folder in processor-subfolders. \n\n\n")
