@@ -350,12 +350,22 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         self.timestep += 1
         self.iteration = 0
         self.physical_time += self.dt
-        newPath=os.path.join(self.working_directory, str(self.physical_time))
-        if os.path.isdir(newPath):
-            print("\n\n\n Warning! In 5s, CoCoNuT will overwrite existing time step folder: "+str(newPath) + ". \n\n\n")
-            time.sleep(5)
-            os.system("rm -rf " + newPath)
-        os.system("mkdir "+ newPath)
+        if self.cores <2:
+            newPath=os.path.join(self.working_directory, str(self.physical_time))
+            if os.path.isdir(newPath):
+                print("\n\n\n Warning! In 5s, CoCoNuT will overwrite existing time step folder: "+str(newPath) + ". \n\n\n")
+                time.sleep(5)
+                os.system("rm -rf " + newPath)
+            os.system("mkdir "+ newPath)
+        else :
+            for i in np.arange(self.cores):
+                newPath=os.path.join(self.working_directory, "processor", str(i), str(self.physical_time))
+                if os.path.isdir(newPath):
+                    if i==0:
+                        print("\n\n\n Warning! In 5s, CoCoNuT will overwrite existing time step folder in processor-subfolders. \n\n\n")
+                        time.sleep(5)
+                    os.system("rm -rf " + newPath)
+                os.system("mkdir "+ newPath)
         print('\t Time step '+str(self.timestep))
         
         self.send_message('next') # Let OpenFOAM go to next time step
