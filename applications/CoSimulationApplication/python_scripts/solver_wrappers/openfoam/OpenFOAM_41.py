@@ -798,11 +798,10 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                         with open('tempDisp', 'a+') as file:
                             file.write("\t { \n")
                             file.write("\t\t type  \t fixedValue; \n")
-                            with mp.Nodes[nNodes_previousProc] as node:
-                                dispX=node.X-node.X0
-                                dispY=node.Y-node.Y0
-                                dispZ=node.Z-node.Z0
-                                file.write('\t\t value \t uniform (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+'); \n')
+                            dispX=mp.Nodes[nNodes_previousProc].X-mp.Nodes[nNodes_previousProc].X0
+                            dispY=mp.Nodes[nNodes_previousProc].Y-mp.Nodes[nNodes_previousProc].Y0
+                            dispZ=mp.Nodes[nNodes_previousProc].Z-mp.Nodes[nNodes_previousProc].Z0
+                            file.write('\t\t value \t uniform (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+'); \n')
                         file.close()
                     elif self.nNodes_proc[nKey,p] < 11: # 10 or less elements on the interface in this processor-folder
                         with open('tempDisp', 'a+') as file:
@@ -810,11 +809,11 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                             file.write("\t\t type  \t fixedValue; \n")
                             file.write('\t\t value \t nonuniform List<vector> (')
                             for i in np.arange(self.nNodes_proc[nKey,p]):
-                                with mp.Nodes[nNodes_previousProc+i] as node:
-                                    dispX=node.X-node.X0
-                                    dispY=node.Y-node.Y0
-                                    dispZ=node.Z-node.Z0
-                                    file.write(' (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+') ')
+                                mp.Nodes[nNodes_previousProc+i]
+                                dispX=mp.Nodes[nNodes_previousProc+i].X-mp.Nodes[nNodes_previousProc+i].X0
+                                dispY=mp.Nodes[nNodes_previousProc+i].Y-mp.Nodes[nNodes_previousProc+i].Y0
+                                dispZ=mp.Nodes[nNodes_previousProc+i].Z-mp.Nodes[nNodes_previousProc+i].Z0
+                                file.write(' (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+') ')
                             file.write(');\n')
                         file.close()
                     else :    
@@ -823,11 +822,11 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                             file.write("\t\t type  \t fixedValue; \n")
                             file.write('\t\t value \t nonuniform List<vector> ( \n')
                             for i in np.arange(self.nNodes_proc[nKey,p]):
-                                with mp.Nodes[nNodes_previousProc+i] as node:
-                                    dispX=node.X-node.X0
-                                    dispY=node.Y-node.Y0
-                                    dispZ=node.Z-node.Z0
-                                    file.write(' (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+') \n')
+                                mp.Nodes[nNodes_previousProc+i]
+                                dispX=mp.Nodes[nNodes_previousProc+i].X-mp.Nodes[nNodes_previousProc+i].X0
+                                dispY=mp.Nodes[nNodes_previousProc+i].Y-mp.Nodes[nNodes_previousProc+i].Y0
+                                dispZ=mp.Nodes[nNodes_previousProc+i].Z-mp.Nodes[nNodes_previousProc+i].Z0
+                                file.write(' (' + f'{dispX:27.17e} {dispY:27.17e} {dispZ:27.17e}'+') \n')
                             file.write(');\n')
                         file.close()
                     os.system("wc -l " + disp_file + " > lengthDisp")
