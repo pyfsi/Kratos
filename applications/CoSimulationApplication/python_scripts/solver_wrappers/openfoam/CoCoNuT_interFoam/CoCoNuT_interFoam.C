@@ -106,13 +106,14 @@ int main(int argc, char *argv[])
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
 
-    #include "readControls.H"
-    #include "CourantNo.H"
-    #include "setDeltaT.H"
-
     while (runTime.run()) // or True?
     {
         usleep(1000); // Expressed in microseconds 
+
+        #include "readControls.H"
+        #include "CourantNo.H"
+        #include "alphaCourantNo.H"
+        #include "setDeltaT.H"
             
         if (exists("next.coco"))
     	{
@@ -126,25 +127,7 @@ int main(int argc, char *argv[])
         
         if (exists("continue.coco"))
     	{
-        	remove("continue.coco");        		
-        	        		
-        	// Calculate the mesh motion and update the mesh
-            mesh.update();
-
-            // Calculate absolute flux from the mapped surface velocity
-            phi = mesh.Sf() & Uf;
-            if (mesh.changing() && correctPhi)
-            {
-               #include "correctPhi.H"
-            }
-            
-            // Make the flux relative to the mesh motion
-            fvc::makeRelative(phi, U);
-
-            if (mesh.changing() && checkMeshCourantNo)
-            {
-                #include "meshCourantNo.H"
-            }
+            remove("continue.coco");        		
 
             // --- Pressure-velocity PIMPLE corrector loop
             while (pimple.loop())
@@ -153,6 +136,9 @@ int main(int argc, char *argv[])
                 {
                     scalar timeBeforeMeshUpdate = runTime.elapsedCpuTime();
                     mesh.update();
+
+		    Info << "I get here 2" << endl;
+
 
                     if (mesh.changing())
                     {
