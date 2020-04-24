@@ -89,7 +89,7 @@ volScalarField p
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
-        IOobject::AUTO_WRITE
+        IOobject::MUST_WRITE
     ),
     p_rgh + rho*gh
 );
