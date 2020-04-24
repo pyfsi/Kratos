@@ -116,16 +116,18 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         rawFile.close()
         newFile.close()
         nKey=0
-        for key in self.boundary_names:
-            if nKey == 0:
-                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,True,False)
-            else: 
-                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,False,False)
-            if nKey == (len(self.boundary_names)-1):
-                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects_CoCoNuT.so",key,False,True)
-            else:
-                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects_CoCoNuT.so",key,False,False)
-            nKey += 1
+        if len(self.boundary_names) == 1:
+            for key in self.boundary_names:
+                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects.so",key,True,True)
+        else:
+            for key in self.boundary_names:
+                if nKey == 0:
+                    self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects.so",key,True,False)
+                else if nKey == (len(self.boundary_names)-1):
+                    self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,False,True)
+                else:
+                    self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,False,False)
+                nKey += 1
         self.write_footer(controlDict_name)
         # DynamicMeshDict: replace raw settings by actual settings defined by user in json-file 
         dynamicMeshDict_raw_name=os.path.join(os.path.realpath(os.path.dirname(__file__)),"dynamicMeshDict_raw")
@@ -491,7 +493,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
             it=0
             if self.cores == 1:
                 wss_file= os.path.join(self.working_directory, str(self.physical_time), "wallShearStress")
-                pres_file= os.path.join(self.working_directory, str(self.physical_time), "static(p)")
+                pres_file= os.path.join(self.working_directory, str(self.physical_time), "p")
                 if self.nNodes_proc[nKey,0] == 1: #Single node on interface (Really??)
                     #Read wall shear stress
                     while True:
@@ -613,7 +615,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                 nodeCount=0
                 for p in np.arange(self.cores):
                     wss_file= os.path.join(self.working_directory, ("processor"+str(p)), str(self.physical_time), "wallShearStress")
-                    pres_file= os.path.join(self.working_directory, ("processor"+str(p)), str(self.physical_time), "static(p)")
+                    pres_file= os.path.join(self.working_directory, ("processor"+str(p)), str(self.physical_time), "p")
                     if self.nNodes_proc[nKey,p] == 1: #Single node of the interface on this processor
                         # read wall shear stress
                         while True:
