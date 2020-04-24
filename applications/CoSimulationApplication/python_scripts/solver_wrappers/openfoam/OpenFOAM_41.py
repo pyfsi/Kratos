@@ -136,7 +136,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
                     line=line.replace('|MESHMOTION_SOLVER|',str(self.meshmotion_solver))
                     line=line.replace('|DIFFUSIVITY|',str(self.diffusivity))
                     line=line.replace('|NUM_INTERFACE_INPUT|',str(len(self.settings['boundary_names'].list())))
-                    line=line.replace('|INTERFACE_INPUT|',str(self.settings['boundary_names'].list()))
+                    line=line.replace('|INTERFACE_INPUT|',str(self.settings['boundary_names'].items()))
                     newFile.write(line)
         rawFile.close()
         newFile.close()
