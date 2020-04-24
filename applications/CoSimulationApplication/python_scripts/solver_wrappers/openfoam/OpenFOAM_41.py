@@ -130,8 +130,8 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         # DynamicMeshDict: replace raw settings by actual settings defined by user in json-file 
         dynamicMeshDict_raw_name=os.path.join(os.path.realpath(os.path.dirname(__file__)),"dynamicMeshDict_raw")
         dynamicMeshDict_name=os.path.join(self.working_directory,"constant/dynamicMeshDict")
-        with open(controlDict_raw_name,'r') as rawFile:
-            with open(controlDict_name,'w') as newFile:
+        with open(dynamicMeshDict_raw_name,'r') as rawFile:
+            with open(dynamicMeshDict_name,'w') as newFile:
                 for line in rawFile:
                     line=line.replace('|MESHMOTION_SOLVER|',str(self.meshmotion_solver))
                     line=line.replace('|DIFFUSIVITY|',str(self.diffusivity))
@@ -480,7 +480,7 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         
     def read_node_output(self):
         nKey=0
-        maxIt=100
+        maxIt=20
         for boundary in self.boundary_names:
             wss_tmp=np.zeros([self.nNodes_tot[nKey],3])
             pres_tmp=np.zeros([self.nNodes_tot[nKey],3])
