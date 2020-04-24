@@ -123,8 +123,6 @@ int main(int argc, char *argv[])
     		Info << "Time = " << runTime.timeName() << nl << endl; // Might be deleted when linked to CoCoNuT (which already outputs current time step)
     	}
 
-	Info << " Before continue " <<  endl;
-        
         if (exists("continue.coco"))
     	{
             remove("continue.coco");        		
