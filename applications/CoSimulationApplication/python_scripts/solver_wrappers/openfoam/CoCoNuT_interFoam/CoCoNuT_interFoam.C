@@ -218,7 +218,9 @@ int main(int argc, char *argv[])
             IOobject controlDict_IO = IOobject("controlDict", runTime.system(),mesh,IOobject::MUST_READ,IOobject::AUTO_WRITE);
             IOdictionary controlDict(controlDict_IO);
             controlDict.Foam::regIOobject::write();
-                
+            
+	    runTime.write();
+		    
             OFstream outfile ("continue_ready.coco");
             outfile << "Joris says good job on continue.coco" << endl;
     			            
