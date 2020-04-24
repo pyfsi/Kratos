@@ -976,9 +976,5 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         versionNr=lastLine.split(' ')[-1]
         if versionNr[:-1] != self.moduleVersion :
                 sys.exit("OpenFOAM 4.1 should be loaded! Currently, another version of OpenFOAM is loaded")
-        
-        #Check that a 'dynamicMeshDict' is present in the constant-folder of the case
-        dynamicMeshDict_file=os.path.join(self.working_directory,"constant/dynamicMeshDict")
-        if not(os.path.isfile(dynamicMeshDict_file)):
-            sys.exit("Please make sure that a 'dynamicMeshDict' file is defined in the constant-folder of your working-directory.")       
+            
     
