@@ -118,13 +118,13 @@ class SolverWrapperOpenFOAM_41(CoSimulationComponent):
         nKey=0
         for key in self.boundary_names:
             if nKey == 0:
-                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects.so",key,True,False)
+                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,True,False)
             else: 
-                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects.so",key,False,False)
+                self.write_controlDict_function(controlDict_name,"wallShearStress","libfieldFunctionObjects_CoCoNuT.so",key,False,False)
             if nKey == (len(self.boundary_names)-1):
-                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects.so",key,False,True)
+                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects_CoCoNuT.so",key,False,True)
             else:
-                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects.so",key,False,False)
+                self.write_controlDict_function(controlDict_name,"pressure","libfieldFunctionObjects_CoCoNuT.so",key,False,False)
             nKey += 1
         self.write_footer(controlDict_name)
         # DynamicMeshDict: replace raw settings by actual settings defined by user in json-file 

@@ -97,11 +97,9 @@ int main(int argc, char *argv[])
 
     turbulence->validate();
 
-    if (!LTS)
-    {
-        #include "CourantNo.H"
-        #include "setInitialDeltaT.H"
-    }
+    #include "CourantNo.H"
+    #include "setInitialDeltaT.H"
+   
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
@@ -110,35 +108,47 @@ int main(int argc, char *argv[])
     {
         usleep(1000); // Expressed in microseconds 
 
-        #include "readControls.H"
-        #include "CourantNo.H"
-        #include "alphaCourantNo.H"
-        #include "setDeltaT.H"
-            
         if (exists("next.coco"))
     	{
         	remove("next.coco");
-        	
+  	        #include "readControls.H"
+
+              	#include "CourantNo.H"
+        	// #include "alphaCourantNo.H"
+        	#include "setDeltaT.H"       	
+	
 	      	runTime++;
         	OFstream outfile ("next_ready.coco");
         	outfile << "Joris says: good job on next.coco" << endl;
     		Info << "Time = " << runTime.timeName() << nl << endl; // Might be deleted when linked to CoCoNuT (which already outputs current time step)
     	}
+
+	Info << " Before continue " <<  endl;
         
         if (exists("continue.coco"))
     	{
             remove("continue.coco");        		
+	    
+	    Info << " " << endl;
+            Info << "Stamp 0 " << endl;
+	    Info << " " << endl;    
 
             // --- Pressure-velocity PIMPLE corrector loop
             while (pimple.loop())
             {
+	            Info << " " << endl;
+	            Info << "Stamp 1 " << endl;
+        	    Info << " " << endl;
+
+			
                 if (pimple.firstIter() || moveMeshOuterCorrectors)
                 {
                     scalar timeBeforeMeshUpdate = runTime.elapsedCpuTime();
                     mesh.update();
 
-		    Info << "I get here 2" << endl;
-
+	            Info << " " << endl;
+        	    Info << "Stamp 2 " << endl;
+            	    Info << " " << endl;
 
                     if (mesh.changing())
                     {
@@ -149,6 +159,10 @@ int main(int argc, char *argv[])
                          gh = (g & mesh.C()) - ghRef;
                          ghf = (g & mesh.Cf()) - ghRef;
                     }
+
+	            Info << " " << endl;
+	            Info << "Stamp 3 " << endl;
+        	    Info << " " << endl;
 
                     if (mesh.changing() && correctPhi)
                     {
@@ -169,6 +183,10 @@ int main(int argc, char *argv[])
                     }
                 }
 
+                Info << " " << endl;
+        	Info << "Stamp 4 " << endl;
+	        Info << " " << endl;
+
                 #include "alphaControls.H"
                 #include "alphaEqnSubCycle.H"
 
@@ -186,6 +204,11 @@ int main(int argc, char *argv[])
                 {
                     turbulence->correct();
                 }
+
+            	Info << " " << endl;
+            	Info << "Stamp 5 " << endl;
+            	Info << " " << endl;
+
             }
                 
             // Return the coupling interface output
